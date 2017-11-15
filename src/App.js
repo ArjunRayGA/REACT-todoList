@@ -73,7 +73,7 @@ class App extends Component {
     event.preventDefault()
     console.log(this.state.userName, this.state.password)
     axios
-      .post('https://blooming-stream-25969.herokuapp.com/sign-in', {
+      .post('http://localhost:4741/sign-in', {
       credentials: {
         email: this.state.userName,
         password: this.state.password
@@ -88,7 +88,7 @@ class App extends Component {
     
   getEvents() {      
     axios
-        .get('https://blooming-stream-25969.herokuapp.com/events', {
+        .get('http://localhost:4741/events', {
           headers: {
             'Authorization': 'Token token=' + this.state.token
         }
