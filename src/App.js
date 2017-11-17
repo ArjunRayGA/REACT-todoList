@@ -1,116 +1,104 @@
+// IMPORT PACKAGES, REACT FIRST
 import React, {Component} from 'react';
-import logo from './logo.svg';
-import './App.css';
 import axios from 'axios';
 
+// IMPORT ASSETS (IMAGES, STYLES, ETC)
+import logo from './logo.svg';
+import './App.css';
+
+// IMPORT COMPONENTS
 import EventForm from './EventForm';
-// import Events from './Events';
 import LoginForm from './LoginForm';
 import DisplayLoginInfo from './DisplayLoginInfo';
 
 class App extends Component {
   constructor(props) {
     super(props)
+
+    // set vars that don't change, ie not state
+    this.backend = 'http://localhost:4741'
+
+    // set vars to describe the state of the App component
     this.state = {
-      userName: '',
-      password: '',
-      token: null,
-      events: [],
-      selectedEvent: null
+      auth: {
+        userName: '',
+        password: '',
+        token: null
+      },
+      _triggerChildren: { // changing these values at all trigger actions in certain child components
+        getEventsRequest: false
+      }
     }
 
-    this.getState = this
-      .getState
-      .bind(this)
-    this.submitLogin = this
-      .submitLogin
-      .bind(this)
-    this.userNameChange = this
-      .userNameChange
-      .bind(this)
-    this.passwordChange = this
-      .passwordChange
-      .bind(this)
-    this.selectEvent = this
-      .selectEvent
-      .bind(this)      
-  }
-
-  //setter method
-  selectEvent(event) {
-    this.setState({
-      selectedEvent: event.target.id
+    // bind 'this' context to class methods
+    const bindMethods = ['loginRequest', 'userNameChange', 'passwordChange', 'loginSubmit']
+    bindMethods.forEach(method => {
+      this[method] = this[method].bind(this)
     })
-    console.log(`I set selectedEvent state as ${event.target.id}!`)
+
   }
 
-  // setter method
-  setEvent(event) {
-    const targetEventId = event.target.id
-    const events = this.state.events
-    // let eventStateId 
-    // for(let n=0; n<=events.length; n++) {
-    //    if(events[n].id == targetEventId ) {
-    //      this.setState({
-    //        events: Object.assign({}, this.state.events)
-    //       })
-    //    }
-    // }
-  }
-
+  // trick to get auto-login on load (remove later)
   componentDidMount() {
-    this.setState({userName: 'acarlotto@cox.net', password: 'summer'})
+    this.setState(prevState => {
+      const newState = Object.assign({}, prevState)
+      newState.auth.userName = 'acarlotto@cox.net'
+      newState.auth.password = 'summer'
+      return newState
+    }, this.loginRequest)
   }
 
-  // getter method
-  getState(event) {
-    event.preventDefault()
-    console.log(this.state)
-  }
-
-  // HTTP requests
-  submitLogin(event) {
-    event.preventDefault()
-    console.log(this.state.userName, this.state.password)
+  // HTTP REQUESTS
+  loginRequest() {
     axios
-      .post('http://localhost:4741/sign-in', {
+      .post(`${this.backend}/sign-in`, {
       credentials: {
-        email: this.state.userName,
-        password: this.state.password
+        email: this.state.auth.userName,
+        password: this.state.auth.password
       }
     })
       .then(response => {
         const authToken = response.data.user.token
-        this.setState({token: authToken})
-        this.getEvents()
+        this.setState(prevState => {
+          const newState = Object.assign({}, prevState)
+          newState.auth.token = authToken
+          return newState
+        })
       })
-    }
-    
-  getEvents() {      
-    axios
-        .get('http://localhost:4741/events', {
-          headers: {
-            'Authorization': 'Token token=' + this.state.token
-        }
-    })
-    .then(response => {
-        const events = response.data.events
-        this.setState({events: events})
-    })
+      .then(() => {
+        this.setState(prevState => {
+          const newState = Object.assign({}, prevState)
+          newState._triggerChildren.getEventsRequest = !newState._triggerChildren.getEventsRequest
+          return newState
+        })
+      })
+      .catch(error => {
+        console.error('login failed!', error)
+      })
   }
 
-  eventTitle(event) {
-    this.setState({event: event.target.value})
-  }
-
-  // state change handlers
+  // EVENT HANDLERS
   userNameChange(event) {
-    // console.log('s')
-    this.setState({userName: event.target.value})
+    const userName = event.target.value
+    this.setState((prevState) => {
+      const newState = Object.assign({}, prevState)
+      newState.auth.userName = userName
+      return newState
+    })
   }
 
   passwordChange(event) {
-    this.setState({password: event.target.value})
+    const password = event.target.value
+    this.setState(prevState => {
+      const newState = Object.assign({}, prevState)
+      newState.auth.password = password
+      return newState
+    })
+  }
+
+  loginSubmit(event) {
+    event.preventDefault()
+    this.loginRequest()
   }
 
   render() {
@@ -126,29 +114,20 @@ class App extends Component {
           and save to reload.
         </p>
         <LoginForm
-          password={this.state.password}
-          username={this.state.userName}
+          password={this.state.auth.password}
+          username={this.state.auth.userName}
           userNameChange={this.userNameChange}
           passwordChange={this.passwordChange}
-          submitLogin={this.submitLogin}/>
-
-          <button onClick={this.getState}>get the state!</button>
-
+          loginSubmit={this.loginSubmit}/>
         <DisplayLoginInfo
-          password={this.state.password}
-          username={this.state.userName}
-          token={this.state.token}/> 
-          {/* <button onClick={this.getState}>get the state!</button> */}
-          
-          <EventForm 
-             selectedEvent={this.state.selectedEvent} 
-             setEvent={this.setEvent} 
-             selectEvent={this.selectEvent} 
-             events={this.state.events}
-            />
-
-            {/* <Events 
-              events={this.state.events}/> */}
+          password={this.state.auth.password}
+          username={this.state.auth.userName}
+          token={this.state.auth.token}/>
+        <EventForm
+          triggerGetEvents={this.state._triggerChildren.getEventsRequest}
+          backend={this.backend}
+          auth={this.state.auth}
+          />
       </div>
     );
   }
