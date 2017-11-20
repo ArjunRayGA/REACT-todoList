@@ -14,7 +14,7 @@ class EventForm extends Component {
       selectedEvent: null
     }
 
-    const bindMethods = ['setEventTitle', 'setSelectedEvent', 'submitEventEdit', 'cancelEventEdit']
+    const bindMethods = ['setEventTitle', 'setSelectedEvent', 'submitEventEdit', 'cancelEventEdit', 'clearSelectedEvent']
     bindMethods.forEach(method => {
       this[method] = this[method].bind(this)
     })
@@ -28,7 +28,7 @@ class EventForm extends Component {
   }
 
   getEventsRequest() {
-    axios
+    return axios
       .get(`${this.backend}/events`, {
       headers: {
         'Authorization': 'Token token=' + this.props.auth.token
@@ -44,7 +44,7 @@ class EventForm extends Component {
   }
 
   patchEventRequest(eventId, data) {
-    axios.patch(`${this.backend}/events/${eventId}`, {
+    return axios.patch(`${this.backend}/events/${eventId}`, {
       event: {
         title: data.title
       }
@@ -53,12 +53,9 @@ class EventForm extends Component {
         'Authorization': 'Token token=' + this.props.auth.token,
         'Content-Type': 'application/json'
       }
-    }).then(() => {
-      this.setState({
-        selectedEvent: null
-      })
-      this.getEventsRequest()
-    }).catch(error => {
+    })
+    .then(this.clearSelectedEvent)
+    .catch(error => {
       console.error('patch event failed!', error.response)
       this.getEventsRequest()
     })
@@ -81,20 +78,23 @@ class EventForm extends Component {
     this.setState({selectedEvent: eventId})
   }
 
+  clearSelectedEvent() {
+    this.getEventsRequest()
+    .then(() => {
+      this.setState({selectedEvent: null})
+    })
+  }
+
   submitEventEdit(event) {
     event.preventDefault()
     const eventId = event.target.dataset.id      
     const titleVal = document.querySelector(`#event-${eventId}`).value
-    this.patchEventRequest(event.target.id, {title: titleVal})    
+    this.patchEventRequest(eventId, {title: titleVal})    
   }
 
   cancelEventEdit(event) {
     event.preventDefault()
-    this.setState({
-      selectedEvent: null
-    })
-    console.log('hi')
-    this.getEventsRequest()
+    this.clearSelectedEvent()
   }
 
   render() {

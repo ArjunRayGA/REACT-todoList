@@ -4,7 +4,8 @@ const Event = (props) => {
 
   const eventStyle = {
     background: 'transparent',
-    outline: '0'
+    outline: '0',
+    width: '200px'
   }
 
   const selectedEventStyle = {
@@ -18,7 +19,8 @@ const Event = (props) => {
   }
 
   const eventButtonStyle = {
-     border: '0px'
+     border: '0px',
+     marginLeft: '5px'
   }
 
   const hiddenEventButtonStyle = {
