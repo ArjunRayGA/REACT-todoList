@@ -14,7 +14,7 @@ class EventForm extends Component {
       selectedEvent: null
     }
 
-    const bindMethods = ['setEventTitle', 'setSelectedEvent']
+    const bindMethods = ['setEventTitle', 'setSelectedEvent', 'submitEventEdit', 'cancelEventEdit']
     bindMethods.forEach(method => {
       this[method] = this[method].bind(this)
     })
@@ -54,26 +54,47 @@ class EventForm extends Component {
         'Content-Type': 'application/json'
       }
     }).then(() => {
-      this.setState(prevState => {
-        const newState = Object.assign({}, prevState)
-        for(let n=0; n<newState.events.length; n++) {
-          if(`${newState.events[n].id}` === eventId) {
-            newState.events[n].title = data.title 
-          }
-        }
-        return newState
+      this.setState({
+        selectedEvent: null
       })
+      this.getEventsRequest()
     }).catch(error => {
       console.error('patch event failed!', error.response)
+      this.getEventsRequest()
     })
   }
 
   setEventTitle(event) {
-    this.patchEventRequest(event.target.id, {title: event.target.value})
+    const eventId = event.target.id.replace('event-', '')
+    const newVal = event.target.value
+    this.setState(prevState => {
+      const newState = Object.assign({}, prevState)
+      window.newState = newState
+      const editedIdx = newState.events.findIndex(event => eventId === `${event.id}`)
+      newState.events[editedIdx].title = newVal
+      return newState
+    })
   }
 
   setSelectedEvent(event) {
-    this.setState({selectedEvent: event.target.id})
+    const eventId = event.target.id.replace('event-', '')    
+    this.setState({selectedEvent: eventId})
+  }
+
+  submitEventEdit(event) {
+    event.preventDefault()
+    const eventId = event.target.dataset.id      
+    const titleVal = document.querySelector(`#event-${eventId}`).value
+    this.patchEventRequest(event.target.id, {title: titleVal})    
+  }
+
+  cancelEventEdit(event) {
+    event.preventDefault()
+    this.setState({
+      selectedEvent: null
+    })
+    console.log('hi')
+    this.getEventsRequest()
   }
 
   render() {
@@ -84,6 +105,8 @@ class EventForm extends Component {
             selected={`${event.id}` == this.state.selectedEvent}
             setEventTitle={this.setEventTitle}
             setSelectedEvent={this.setSelectedEvent}
+            cancelEventEdit={this.cancelEventEdit}
+            submitEventEdit={this.submitEventEdit}
             key={event.id}
             eventId={event.id}
             title={event.title}/>

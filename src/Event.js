@@ -17,10 +17,19 @@ const Event = (props) => {
     ...eventStyle
   }
 
+  const eventButtonStyle = {
+     border: '0px'
+  }
+
+  const hiddenEventButtonStyle = {
+    visibility: 'hidden',
+    ...eventButtonStyle
+  }
+
   return (
     <li>
       <input
-        id={props.eventId}
+        id={`event-${props.eventId}`}
         onDoubleClick={props.setSelectedEvent}
         onChange={props.setEventTitle}
         readOnly={!props.selected}
@@ -28,6 +37,18 @@ const Event = (props) => {
             ? selectedEventStyle
             : unselectedEventStyle}
         value={props.title}/>
+        <button style={props.selected
+            ? eventButtonStyle
+            : hiddenEventButtonStyle}
+        data-id={props.eventId}            
+        onClick={props.submitEventEdit}
+        >Submit</button>
+        <button style={props.selected
+            ? eventButtonStyle
+            : hiddenEventButtonStyle}
+        data-id={props.eventId}
+        onClick={props.cancelEventEdit}            
+        >Cancel</button>
     </li>
   )
 }
