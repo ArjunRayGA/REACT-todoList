@@ -31,7 +31,7 @@ class App extends Component {
     }
 
     // bind 'this' context to class methods
-    const bindMethods = ['loginRequest', 'userNameChange', 'passwordChange', 'loginSubmit']
+    const bindMethods = ['loginPost', 'userNameChange', 'passwordChange', 'loginSubmit']
     bindMethods.forEach(method => {
       this[method] = this[method].bind(this)
     })
@@ -45,11 +45,11 @@ class App extends Component {
       newState.auth.userName = 'acarlotto@cox.net'
       newState.auth.password = 'summer'
       return newState
-    }, this.loginRequest)
+    }, this.loginPost)
   }
 
   // HTTP REQUESTS
-  loginRequest() {
+  loginPost() {
     axios
       .post(`${this.backend}/sign-in`, {
       credentials: {
@@ -98,7 +98,7 @@ class App extends Component {
 
   loginSubmit(event) {
     event.preventDefault()
-    this.loginRequest()
+    this.loginPost()
   }
 
   render() {
