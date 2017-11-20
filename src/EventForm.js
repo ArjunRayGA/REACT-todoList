@@ -21,11 +21,15 @@ class EventForm extends Component {
 
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.triggerGetEvents !== this.props.triggerGetEvents) {
-      this.getEventsRequest()
-    }
+  componentWillMount() {
+    this.getEventsRequest()
   }
+
+  // componentWillReceiveProps(nextProps) {
+  //   if (nextProps.triggerGetEvents !== this.props.triggerGetEvents) {
+  //     this.getEventsRequest()
+  //   }
+  // }
 
   getEventsRequest() {
     return axios
@@ -102,7 +106,7 @@ class EventForm extends Component {
     const eventsList = this.state.events.map(event => {
         return (
           <Event
-            selected={`${event.id}` == this.state.selectedEvent}
+            selected={`${event.id}` === this.state.selectedEvent}
             setEventTitle={this.setEventTitle}
             setSelectedEvent={this.setSelectedEvent}
             cancelEventEdit={this.cancelEventEdit}

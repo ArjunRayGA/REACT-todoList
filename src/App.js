@@ -7,6 +7,7 @@ import logo from './logo.svg';
 import './App.css';
 
 // IMPORT COMPONENTS
+import {BrowserRouter, Route, Link} from 'react-router-dom'
 import EventForm from './EventForm';
 import LoginForm from './LoginForm';
 import DisplayLoginInfo from './DisplayLoginInfo';
@@ -25,9 +26,9 @@ class App extends Component {
         password: '',
         token: null
       },
-      _triggerChildren: { // changing these values at all trigger actions in certain child components
-        getEventsRequest: false
-      }
+      // _triggerChildren: { // changing these values at all trigger actions in certain child components
+      //   getEventsRequest: false
+      // }
     }
 
     // bind 'this' context to class methods
@@ -65,17 +66,18 @@ class App extends Component {
           return newState
         })
       })
-      .then(() => {
-        this.setState(prevState => {
-          const newState = Object.assign({}, prevState)
-          newState._triggerChildren.getEventsRequest = !newState._triggerChildren.getEventsRequest
-          return newState
-        })
-      })
+      // .then(() => {
+      //   this.setState(prevState => {
+      //     const newState = Object.assign({}, prevState)
+      //     newState._triggerChildren.getEventsRequest = !newState._triggerChildren.getEventsRequest
+      //     return newState
+      //   })
+      // })
       .catch(error => {
         console.error('login failed!', error)
       })
   }
+
 
   // EVENT HANDLERS
   userNameChange(event) {
@@ -101,34 +103,62 @@ class App extends Component {
     this.loginPost()
   }
 
+
+
   render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo"/>
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit
-          <code>src/App.js</code>
-          and save to reload.
-        </p>
+    const RenderedLoginForm = () => {
+      return (
         <LoginForm
           password={this.state.auth.password}
           username={this.state.auth.userName}
           userNameChange={this.userNameChange}
           passwordChange={this.passwordChange}
           loginSubmit={this.loginSubmit}/>
+        )
+
+    }
+    const RenderedDisplayLoginInfo = () => {
+      return (  
         <DisplayLoginInfo
           password={this.state.auth.password}
           username={this.state.auth.userName}
           token={this.state.auth.token}/>
+      )
+    }
+    const RenderedEventForm = () => {
+      return (  
         <EventForm
-          triggerGetEvents={this.state._triggerChildren.getEventsRequest}
+          // triggerGetEvents={this.state._triggerChildren.getEventsRequest}
           backend={this.backend}
           auth={this.state.auth}
           />
-      </div>
+      )
+    }
+
+    const listItemStyle = {
+      display: 'inline',
+      paddingLeft: '10px',
+      paddingRight: '10px'
+    }
+
+    return (
+      <BrowserRouter>
+        <div className="App">
+          <header className="App-header">
+            <img src={logo} className="App-logo" alt="logo"/>
+            <h1 className="App-title">Welcome to React Todo List</h1>
+          </header>
+          <ul>
+            <li style={listItemStyle}><Link to='/'>Login</Link></li>
+            <li style={listItemStyle}><Link to='/login-info'>Display Login Info</Link></li>
+            <li style={listItemStyle}><Link to='/events'>Events</Link></li>
+          </ul>
+          
+          <Route exact path='/' component={RenderedLoginForm} />
+          <Route path='/login-info' component={RenderedDisplayLoginInfo} />
+          <Route path='/events' component={RenderedEventForm} />
+        </div>
+      </BrowserRouter>
     );
   }
 }
