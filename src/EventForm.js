@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
-import axios from 'axios';
+import React, {Component} from 'react'
+import axios from 'axios'
 
-import Event from './Event';
+import Event from './Event'
 
 class EventForm extends Component {
   constructor(props) {
@@ -24,12 +24,6 @@ class EventForm extends Component {
   componentWillMount() {
     this.getEventsRequest()
   }
-
-  // componentWillReceiveProps(nextProps) {
-  //   if (nextProps.triggerGetEvents !== this.props.triggerGetEvents) {
-  //     this.getEventsRequest()
-  //   }
-  // }
 
   getEventsRequest() {
     return axios

@@ -1,16 +1,20 @@
 // IMPORT PACKAGES, REACT FIRST
-import React, {Component} from 'react';
-import axios from 'axios';
+import React, {Component} from 'react'
+import axios from 'axios'
+import { createBrowserHistory } from 'history' 
 
 // IMPORT ASSETS (IMAGES, STYLES, ETC)
-import logo from './logo.svg';
-import './App.css';
+import logo from './logo.svg'
+import './App.css'
 
 // IMPORT COMPONENTS
-import {BrowserRouter, Route, Link} from 'react-router-dom'
-import EventForm from './EventForm';
-import LoginForm from './LoginForm';
-import DisplayLoginInfo from './DisplayLoginInfo';
+import {Router, Route, Link} from 'react-router-dom'
+import EventForm from './EventForm'
+import LoginForm from './LoginForm'
+import DisplayLoginInfo from './DisplayLoginInfo'
+
+// create history object to allow navigation history and pushing routes
+const history = createBrowserHistory()
 
 class App extends Component {
   constructor(props) {
@@ -25,10 +29,7 @@ class App extends Component {
         userName: '',
         password: '',
         token: null
-      },
-      // _triggerChildren: { // changing these values at all trigger actions in certain child components
-      //   getEventsRequest: false
-      // }
+      }
     }
 
     // bind 'this' context to class methods
@@ -36,11 +37,10 @@ class App extends Component {
     bindMethods.forEach(method => {
       this[method] = this[method].bind(this)
     })
-
   }
 
   // trick to get auto-login on load (remove later)
-  componentDidMount() {
+  componentDidMount() {    
     this.setState(prevState => {
       const newState = Object.assign({}, prevState)
       newState.auth.userName = 'acarlotto@cox.net'
@@ -66,13 +66,9 @@ class App extends Component {
           return newState
         })
       })
-      // .then(() => {
-      //   this.setState(prevState => {
-      //     const newState = Object.assign({}, prevState)
-      //     newState._triggerChildren.getEventsRequest = !newState._triggerChildren.getEventsRequest
-      //     return newState
-      //   })
-      // })
+      .then(() => {
+        history.push('/events')
+      })
       .catch(error => {
         console.error('login failed!', error)
       })
@@ -103,8 +99,6 @@ class App extends Component {
     this.loginPost()
   }
 
-
-
   render() {
     const RenderedLoginForm = () => {
       return (
@@ -128,7 +122,6 @@ class App extends Component {
     const RenderedEventForm = () => {
       return (  
         <EventForm
-          // triggerGetEvents={this.state._triggerChildren.getEventsRequest}
           backend={this.backend}
           auth={this.state.auth}
           />
@@ -142,7 +135,7 @@ class App extends Component {
     }
 
     return (
-      <BrowserRouter>
+      <Router history={history}>
         <div className="App">
           <header className="App-header">
             <img src={logo} className="App-logo" alt="logo"/>
@@ -158,7 +151,7 @@ class App extends Component {
           <Route path='/login-info' component={RenderedDisplayLoginInfo} />
           <Route path='/events' component={RenderedEventForm} />
         </div>
-      </BrowserRouter>
+      </Router>
     );
   }
 }
