@@ -19,7 +19,8 @@ const Event = (props) => {
   }
 
   const eventButtonStyle = {
-     border: '0px',
+     border: '1px solid gray',
+     background: 'lightgray',
      marginLeft: '5px'
   }
 
