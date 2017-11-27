@@ -4,14 +4,14 @@ import axios from 'axios'
 import { createBrowserHistory } from 'history' 
 
 // IMPORT ASSETS (IMAGES, STYLES, ETC)
-import logo from './logo.svg'
-import './App.css'
+import logo from '../assets/images/logo.svg'
+import '../assets/css/App.css'
 
 // IMPORT COMPONENTS
 import {Router, Route, Link} from 'react-router-dom'
 import EventForm from './EventForm'
-import LoginForm from './LoginForm'
-import DisplayLoginInfo from './DisplayLoginInfo'
+import LoginForm from '../components/LoginForm'
+import DisplayLoginInfo from '../components/DisplayLoginInfo'
 
 // create history object to allow navigation history and pushing routes
 const history = createBrowserHistory()
