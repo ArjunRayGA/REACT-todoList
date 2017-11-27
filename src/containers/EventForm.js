@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import axios from 'axios'
 
-import Event from './Event'
+import Event from '../components/Event'
 
 class EventForm extends Component {
   constructor(props) {
